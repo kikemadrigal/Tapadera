@@ -9,4 +9,4 @@ http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapadera.dsk
 
 ## MSX2+
 
-http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapadera2+.dsk
+http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapadera2plus.dsk
