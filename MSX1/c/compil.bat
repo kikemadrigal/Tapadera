@@ -13,7 +13,7 @@ SET DEST=dsk\
 SET INCLUDEDIR=fusion-c\include\
 SET LIBDIR=fusion-c\lib\
 
-SET proga=main
+SET proga=main2
 
 
 SET INC1=%INCLUDEDIR%crt0_msxdos.rel
