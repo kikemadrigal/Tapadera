@@ -17,7 +17,7 @@ http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapmsx1sc2basic.dsk
 #### scroll vertical
 http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapMSX2sc2scv.dsk
 #### scroll horizontal
-http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapMSX2sc2sch
+http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapMSX2sc2sch.dsk
 
 
 
