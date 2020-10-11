@@ -245,7 +245,9 @@
     21000 _TURBO on(mc,me)
     21010 mc=mc-1
     21020 me=me-1
+    1 'Movemos la imagen de la page 0 para el efecto scroll'
     21030 'copy (0,8*9)-(8*32,8*19),0 to (mc,8*9),0
+    1 'Copiamos de nuevo la imagen de la page 1'
     21040 copy (0,8*9)-((8*32),(8*19)),1 to (mc,8*9),0
     21050 if mc=0 then mc=256
     21060 if me>=256 then me=0
