@@ -106,7 +106,7 @@
 1 '     HUD'
 1 ' ----------------------'
     9000 'preset (0,192-8):print #1,"Tapadera game, fre "fre(0)
-    9010 preset (0,192-8):print #1,"mc:"mc", me: "me
+    9010 preset (0,192-8):print #1,"m2:"m2", m1: "m1
 9090 return
 
 
@@ -208,17 +208,11 @@
 1 ' ----------------------'
 1 '         MAP'
 1 ' ----------------------'
-    20000 dim m(32,24): md=6144:mc=256:me=0
+1 'm() nuestro array tiene 2 dimensiones, la 1 es la que almacena las columnas o eje x y la segunda las filas o eje y
+1 'm1 es para controlar el movimiento del 1 copy y m2 es el control del moviemiento del 2 copy
+    20000 dim m(32,24): m2=256:m1=0
 20010 return
 
-1 'Guardamos la información de la tabla de mapa en un array
-    20200 'for f=0 to 25
-        20230 'for c=0 to 31
-            20240 'print #1,vpeek (md);
-            20250 'm(c,f)=vpeek(md):md=md+1
-        20260 'next c
-    20270 'next f
-20280 return
 
 1 'Rutina copiar mapa de la page 1 a la 0'
     20400 copy (0,0)-(255,212),1 to (0,0),0
@@ -242,15 +236,15 @@
 
 1 '32 tiles de ancho por la fila a partir de la cual quiero moverlos'
 1 'Rutina dibujar array, 6144+(32*20)=6784, 6144+(32*23)=6880'
-    21000 _TURBO on(mc,me)
-    21010 mc=mc-1
-    21020 me=me+1
-    1 'Movemos la imagen de la page 0 para el efecto scroll'
-    21030 copy (me,8*9)-(8*32,8*19),1 to (0,8*9),0
+    21000 _TURBO on(m1,m2)
+    21010 m1=m1+1
+    21020 m2=m2-1
+    1 'Copiamos otro trozo movible de la page 1 y lo pegamos encima de la imagen de la page o par dar sensación de movimiento'
+    21030 copy (m1,8*9)-(8*32,8*19),1 to (0,8*9),0
     1 'Copiamos de nuevo la imagen de la page 1'
-    21040 copy (0,8*9)-((8*32),(8*19)),1 to (mc,8*9),0
-    21050 if mc=0 then mc=256
-    21060 if me>=256 then me=0
+    21040 copy (0,8*9)-(8*32,8*19),1 to (m2,8*9),0
+    21050 if m1>=256 then m1=0
+    21060 if m2=0 then m2=256
     21070 _TURBO off
 21100 return
 
