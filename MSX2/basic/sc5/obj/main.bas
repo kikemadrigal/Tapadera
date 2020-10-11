@@ -42,7 +42,7 @@
 1 'Actaulizamos el render'
 540 gosub 7000
 1 'Mostrar infomacion'
-550 gosub 9000
+550 'gosub 9000
 560 goto 500
 
 
@@ -244,8 +244,8 @@
 1 'Rutina dibujar array, 6144+(32*20)=6784, 6144+(32*23)=6880'
     21000 _TURBO on(mc,me)
     21010 mc=mc-1
-    21020 me=me+1
-    21030 copy (0,8*9)-(8*32,8*19),0 to (me,(8*9)-me),0
+    21020 me=me-1
+    21030 copy (0,8*9)-(8*32,8*19),0 to (mc,8*9),0
     21040 copy (0,8*9)-((8*32),(8*19)),1 to (mc,8*9),0
     21050 if mc=0 then mc=256
     21060 if me>=256 then me=0

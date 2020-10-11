@@ -160,7 +160,6 @@ void mostrarSC2 (void) {
 
 void moverPantalla(void){
   contador+=20;
-  //if (contador>255) contador=0; 
   SetScrollH(contador);
 }
 

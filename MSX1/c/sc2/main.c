@@ -25,12 +25,15 @@ unsigned char tablaColor[TAM_TablaColor];
 unsigned char tablaNombres[TAM_TablaNombres];
 unsigned char tablaNombres2D[31][23];
 
+void leerTablaNombres2Dimensiones(void);
+void cambiarTablaNombres2DYtablaNombres(void);
+
 void inicializar_player(struct TPlayer*);
 void actualizar_personaje(struct TPlayer*);
 void procesar_entrada(struct TPlayer*);
 void loadSC2 (char *filename);
 void mostrarSC2 (void);
-//void leerTablaNombres2Dimensiones(void);
+void leerTablaNombres2Dimensiones(void);
 //void cambiarTablaNombres2DYtablaNombres(void);
 //px=100; py=192-32; pv=5; pm=0;
 struct TPlayer player ={100,160,16,16,8,100,6,0,0};
@@ -42,13 +45,11 @@ void main(void){
   Screen(2);
   PutText(0,10,"leyendo..",0);
   //Carga y visualización de la pantalla de carga
-	loadSC2("CITY.BIN");
+	loadSC2("tiles.sc2");
   Cls();
   //leerTablaNombres2Dimensiones();
-  //mostrarSC2();
-  PutText(0,10,352,0);
-	
-  //PutText(0,10,"Screen 2",0);
+  mostrarSC2();
+  PutText(0,10,"Screen 2",0);
   Sprite16();
   inicializar_player(&player);
 
@@ -141,11 +142,13 @@ void mostrarSC2 (void) {
 }
 
 
-/*void leerTablaNombres2Dimensiones(void){
+
+
+void leerTablaNombres2Dimensiones(void){
   unsigned int fila=0;
   unsigned int columna=0;
   char valor[4];
-  //*valor=Itoa(tablaNombres[0],valor,10);
+  //valor=Itoa(tablaNombres[0],valor,10);
   for (int i=0 ; i<TAM_TablaNombres;i++){
     //PutText((columna*32),(fila*8),Itoa(tablaNombres[i],valor,10) ,0);
     tablaNombres2D[columna][fila]=tablaNombres[i];
@@ -173,4 +176,4 @@ void cambiarTablaNombres2DYtablaNombres(void){
     }
   }
   CopyRamToVram (&tablaNombres[0], dirBaseTablaNombres, TAM_TablaNombres);
-}*/
+}
