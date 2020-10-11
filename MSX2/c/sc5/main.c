@@ -7,28 +7,33 @@
 #include "fusion-c/header/newTypes.h"
 #include "fusion-c/header/vdp_sprites.h"
 #include "fusion-c/header/vdp_graph2.h"
-#include "fusion-c/header/psg.h"
-#include "fusion-c/header/io.h"
+
 #include <stdio.h>
 // Para el memset
 #include <string.h>
 #include "player.h"
-#include "tiles.h"
 
 
+
+void leerArchivoPantalla1();
+void leerArchivo(char *archivo);
+void FT_SetName( FCB *p_fcb, const char *p_name );
+void leerArchivo(char *archivo);
+void deRamAVramPage0(void);
+void deRamAVramPage1(void);
+void deVramAVram(void);
 
 void inicializar_player(struct TPlayer*);
 void actualizar_personaje(struct TPlayer*);
 void procesar_entrada(struct TPlayer*);
 
-int FT_LoadSc5Image(char *file_name, unsigned int start_Y, char *buffer);
-void FT_SetName( FCB *p_fcb, const char *p_name );
+
 
 const struct TPlayer player ={100,160,16,16,8,100,6,0,0};
-// Inicializando la estructura del sistema de archivos que está en fusion-c/header/msx_fusion.h
-static FCB file;            
-// Creación de un búfer de 2560 bytes (20 líneas en Sc5)               
-unsigned char LDbuffer[2560];               
+FCB TFile; 
+unsigned char buffer_pantalla[30720];
+char file_name_pantalla_1[]="CITY.SC5";
+int contador=256;        
 
 void main(void){
   
@@ -37,12 +42,15 @@ void main(void){
   Screen(0);
   printf("MSX Police");
   Screen(5);
-  SetDisplayPage (2);             // Page 2
-  SetActivePage(2);
-  Cls();
-	SetActivePage(0);
-  FT_LoadSc5Image("CITY.SC5",512,LDbuffer);       // On charge l'umage
-
+  SetBorderColor(13);
+  //SetDisplayPage (2);             // Page 2
+  //SetActivePage(2);
+  //Cls();
+	//SetActivePage(0);
+  //FT_LoadSc5Image("CITY.SC5",512,LDbuffer);       // On charge l'umage
+  leerArchivoPantalla1();
+  deRamAVramPage0();
+  deRamAVramPage1();
 
   Sprite16();
   inicializar_player(&player);
@@ -54,10 +62,9 @@ void main(void){
     __asm 
     halt
     __endasm;
-
+    deVramAVram();
     procesar_entrada(&player);
     actualizar_personaje(&player);
-    
   }
 
 }
@@ -118,39 +125,60 @@ void procesar_entrada(struct TPlayer *player){
 }
 
 
-/*void leerTablaNombres2Dimensiones(void){
-  unsigned int fila=0;
-  unsigned int columna=0;
-  char valor[4];
-  //valor=Itoa(tablaNombres[0],valor,10);
-  for (int i=0 ; i<TAM_TablaNombres;i++){
-    //PutText((columna*32),(fila*8),Itoa(tablaNombres[i],valor,10) ,0);
-    tablaNombres2D[columna][fila]=tablaNombres[i];
-    columna++;
-    if(i % 31==0){
-      columna=0;
-      fila++;
-    }
-  }
+/**********************************************************
+* *******************MAPA**********************************
+**********************************************************/
+
+void leerArchivoPantalla1(){
+    //Cargamos el archivo en la estructura
+    FT_SetName( &TFile, &file_name_pantalla_1[0] );
+    fcb_open( &TFile );
+    //Sino omitimos los 7 primeros bytes (los que defininen la estructura del binario) aparecen  unas marcas arriba a la derecha
+    fcb_read( &TFile, &buffer_pantalla[0], 7 ); 
+    //Cargamos el archivo definido en la estructura y lo ponemos en la RAM (buffer)
+    fcb_read( &TFile, &buffer_pantalla[0], 30720 );  
+    fcb_close( &TFile );
 }
 
-void cambiarTablaNombres2DYtablaNombres(void){
-  char valor[4];
-  unsigned i=0;
-  for(int fila=0; fila < 24; fila++){
-    //PutText(0,fila*8,Itoa(fila,valor,10),0);
-    for (int columna=0;columna<32; columna++){
-        //PutText((columna*32),(fila*8),Itoa(tablaNombres2D[columna][fila],valor,10) ,0);
-        tablaNombres2D[columna][fila]=tablaNombres2D[columna+1][fila];
-        if (columna=31) {
-          tablaNombres2D[columna][fila]=tablaNombres2D[1][fila];
-        }
-        tablaNombres[i]=tablaNombres2D[columna][fila];
-        i++;
+void leerArchivo(char *archivo){
+    FT_SetName( &TFile, archivo );
+    fcb_open( &TFile );
+    fcb_read( &TFile, &buffer_pantalla[0], 7 );  // Skip 7 first bytes of the file  
+    fcb_read( &TFile, &buffer_pantalla[0], 30720 );  // Read 20 lines of image data (128bytes per line in screen5)
+    fcb_close( &TFile );
+}
+
+
+void deRamAVramPage1(void){
+    //Pasamos del a RAM (con un buffer) a la VRAM
+    //HMMC(&buffer_pantalla[0], posicion x,posición y,longitux de la zona a copiar,la altura de la zona a copiar ); 
+    HMMC(&buffer_pantalla[0], 0,213,256,212 ); 
+}
+void deRamAVramPage0(void){
+    HMMC(&buffer_pantalla[0], 0,0,256,212 ); 
+}
+void deVramAVram(void){
+  contador-=1;
+  //if(contador=0) contador=256;
+  //HMMM(posicion x,posicion y,destina x,destino y,anchura copia,altura copia);
+  HMMM(0,290,contador,76,250,70);
+}
+/*
+void modificarBufferParaEfectoScroll(void){
+  for(int i=0; i<30720;i++){
+    if(i>10240 && i <20480){
+      buffer_pantalla[i]=buffer_pantalla[i+1];
     }
   }
-  CopyRamToVram (&tablaNombres[0], dirBaseTablaNombres, TAM_TablaNombres);
-}*/
+  HMMC(&buffer_pantalla[0], 0,0,0,0);
+}
+*/
+
+
+
+
+
+
 void FT_SetName( FCB *p_fcb, const char *p_name )  // Routine servant à vérifier le format du nom de fichier
 {
   char i, j;
@@ -167,28 +195,4 @@ void FT_SetName( FCB *p_fcb, const char *p_name )  // Routine servant à vérifi
       p_fcb->ext[j] =  p_name[i + j] ;
     }
   }
-}
- 
-
-
-int FT_LoadSc5Image(char *file_name, unsigned int start_Y, char *buffer)        // Charge les données d'un fichiers
-    {
-
-        int rd=2560;
-        FT_SetName( &file, file_name );
-        if(fcb_open( &file ) != FCB_SUCCESS) 
-        {
-              //FT_errorHandler(1, file_name);
-              return (0);
-        }
-
-        fcb_read( &file, buffer, 7 );  // Skip 7 first bytes of the file  
-        while (rd!=0)
-        {
-             rd = fcb_read( &file, buffer, 2560 );  // Read 20 lines of image data (128bytes per line in screen5)
-             HMMC(buffer, 0,start_Y,256,20 ); // Move the buffer to VRAM. 
-             start_Y=start_Y+20;
-         }
-
-return(1);
 }
