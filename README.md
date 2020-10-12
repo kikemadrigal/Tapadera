@@ -44,3 +44,4 @@ http://msx.tipolisto.es/webmsx/standalone/?disk=files/MSX2plussc5basic.dsk
 http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapMSX2plussc2c.dsk
 
 ### sc5
+http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapMSX2plussc5.dsk
