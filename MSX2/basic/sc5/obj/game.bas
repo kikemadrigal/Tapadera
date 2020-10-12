@@ -14,6 +14,7 @@
 220 strig(0) on
 240 'gosub 9000
 500 gosub 21000
+510 'gosub 21300
 520 gosub 6200
 530 gosub 8000
 540 gosub 7000
@@ -78,8 +79,9 @@
         12660 PUT SPRITE ep(i),(ex(i),ey(i)),1,es(i)
     12670 next i
 12680 return
-    20000 dim m(32,24): m2=256:m1=0
-20010 return
+    20000 'dim m(32,24)
+    20010 m2=256:m1=0
+20020 return
     20400 copy (0,0)-(255,212),1 to (0,0),0
 20490 return
     21000 _TURBO on(m1,m2)
@@ -87,7 +89,18 @@
     21020 m2=m2-1
     21030 copy (m1,8*9)-(8*32,8*19),1 to (0,8*9),0
     21040 copy (0,8*9)-(8*32,8*19),1 to (m2,8*9),0
-    21050 if m1>=256 then m1=0
-    21060 if m2=0 then m2=256
-    21070 _TURBO off
-21100 return
+    21045 'copy (m1,0)-(256,212),1 to (8,0),0
+    21050 'copy (8,0)-(256,212),1 to (m2,0),0
+    21060 if m1>=256 then m1=0
+    21070 if m2=0 then m2=256
+    21080 _TURBO off
+21190 return
+    21300 _TURBO on(m1,m2)
+    21330 copy (m1,0)-(255,211),1 to (0,0),0
+    21340 copy (0,0)-(255,211),1 to (m2,0),0
+    21350 m1=m1+1
+    21360 m2=m2-1
+    21370 if m1>=256 then m1=0
+    21380 if m2=0 then m2=256
+    21390 _TURBO off
+21400 return

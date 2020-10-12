@@ -21,38 +21,35 @@ void FT_SetName( FCB *p_fcb, const char *p_name );
 void leerArchivo(char *archivo);
 void deRamAVramPage0(void);
 void deRamAVramPage1(void);
-void deVramAVram(void);
+void deVramAVramEdificios(void);
+void deVramAVramTodaLaPantalla(void);
 
 void inicializar_player(struct TPlayer*);
 void actualizar_personaje(struct TPlayer*);
-void procesar_entrada(struct TPlayer*);
+void procesar_entrada();
 
 
 
-const struct TPlayer player ={100,160,16,16,8,100,6,0,0};
+
 FCB TFile; 
 unsigned char buffer_pantalla[30720];
 char file_name_pantalla_1[]="CITY.SC5";
-int contador=256;        
+int contador1=0;
+int contador2=256;        
 
 void main(void){
   
   SpriteReset();
-  //SetColors(1, 1, 1);	
-  Screen(0);
-  printf("MSX Police");
+  
   Screen(5);
   SetBorderColor(13);
-  //SetDisplayPage (2);             // Page 2
-  //SetActivePage(2);
-  //Cls();
-	//SetActivePage(0);
-  //FT_LoadSc5Image("CITY.SC5",512,LDbuffer);       // On charge l'umage
+
   leerArchivoPantalla1();
   deRamAVramPage0();
   deRamAVramPage1();
 
   Sprite16();
+ 
   inicializar_player(&player);
 
 
@@ -62,14 +59,15 @@ void main(void){
     __asm 
     halt
     __endasm;
-    deVramAVram();
-    procesar_entrada(&player);
+    deVramAVramEdificios();
+    //deVramAVramTodaLaPantalla();
+    procesar_entrada();
     actualizar_personaje(&player);
   }
 
 }
  
-void inicializar_player(struct TPlayer *player ){
+void inicializar_player(struct TPlayer *player){
     // px= player posición eje x, py= player posición eje y
     // pv player velocidad, pm= player movimiento (se obtiene del teclado)
     //px=100; py=192-32; pv=5; pm=0;
@@ -81,12 +79,15 @@ void inicializar_player(struct TPlayer *player ){
     SetSpritePattern( 0, coche_derecha, 32);
     SetSpritePattern( 4, coche_izquierda, 32);
 
+    //Le ponemos el color al sprite
+    //SC5SpriteColors( 0, color_coche_derecha );	
+    //SC5SpriteColors( 0, color_coche_izquierda );	
     // Mostramos nuestro esprite
     // 1. el plano o su definición en la tabla de atributos, ahí s e alamcenará la posición x e y
     // 2 la definición en sprite pattern qu eva de 4 en 4 bytes
     // 3 posición eje x, 4 posición eje y, 5 color
     //Ponemos el player
-    PutSprite( 0, player->plano, player->x, player->y, player->color );
+    PutSprite( 0, player->plano, player->x, player->y, 6 );
     
 }
 void actualizar_personaje(struct TPlayer *player){
@@ -97,7 +98,7 @@ void actualizar_personaje(struct TPlayer *player){
 
 
 //Sistema de input
-void procesar_entrada(struct TPlayer *player){
+void procesar_entrada(){
   //Screen(0);
 	// 0 son cursores teclado
   // 0=inactive  1=up 2=up & right 3=right 4=down & right 5=down 6=down & left 7=left 8=up & left 
@@ -105,19 +106,19 @@ void procesar_entrada(struct TPlayer *player){
     switch (pm)
     {
       case 1:
-          player->y-=player->v;
+          player.y-=player.v;
           break;
       case 3:
-          player->x+=player->v;
-          player->plano=0;
+          player.x+=player.v;
+          player.plano=0;
 
           break;
       case 5:
-          player->y+=player->v;
+          player.y+=player.v;
           break;
       case 7:
-          player->x-=player->v;
-          player->plano=1;
+          player.x-=player.v;
+          player.plano=1;
           break;
       default:
           break;
@@ -147,21 +148,34 @@ void leerArchivo(char *archivo){
     fcb_read( &TFile, &buffer_pantalla[0], 30720 );  // Read 20 lines of image data (128bytes per line in screen5)
     fcb_close( &TFile );
 }
-
-
-void deRamAVramPage1(void){
-    //Pasamos del a RAM (con un buffer) a la VRAM
-    //HMMC(&buffer_pantalla[0], posicion x,posición y,longitux de la zona a copiar,la altura de la zona a copiar ); 
-    HMMC(&buffer_pantalla[0], 0,213,256,212 ); 
-}
 void deRamAVramPage0(void){
-    HMMC(&buffer_pantalla[0], 0,0,256,212 ); 
+  //Pasamos del a RAM (con un buffer) a la VRAM
+  //HMMC(&buffer_pantalla[0], posicion x,posición y,longitux de la zona a copiar,la altura de la zona a copiar ); 
+  HMMC(&buffer_pantalla[0], 0,0,256,212 ); 
 }
-void deVramAVram(void){
-  contador-=1;
+void deRamAVramPage1(void){
+  HMMC(&buffer_pantalla[0], 0,256,256,212 ); 
+}
+
+void deVramAVramEdificios(void){
+  contador1+=1;
+  contador2-=1;
   //if(contador=0) contador=256;
-  //HMMM(posicion x,posicion y,destina x,destino y,anchura copia,altura copia);
-  HMMM(0,290,contador,76,250,70);
+  //HMMM(posicion x,posicion y (si es mayor que 256 es la page 1),destina x,destino y,anchura copia,altura copia);
+  HMMM(contador1,336,0,80,256,70);
+  HMMM(0,336,contador2,80,256,70);
+  if (contador1>255) contador1=0;
+  if (contador2<0) contador2=256;
+}
+void deVramAVramTodaLaPantalla(void){
+  contador1+=1;
+  contador2-=1;
+  //if(contador=0) contador=256;
+  //HMMM(posicion x,posicion y (si es mayor que 256 es la page 1),destina x,destino y,anchura copia,altura copia);
+  HMMM(contador1,256,0,0,256,212);
+  HMMM(0,256,contador2,0,256,212);
+  if (contador1>255) contador1=0;
+  if (contador2<0) contador2=256;
 }
 /*
 void modificarBufferParaEfectoScroll(void){
