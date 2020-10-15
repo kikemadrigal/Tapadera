@@ -13,6 +13,7 @@ Tapadera es un proyecto de prueba
 ## Basic
 ### sc2
 http://msx.tipolisto.es/webmsx/standalone/?disk=files/tapmsx1sc2basic.dsk
+<img src=MSX1/basic/sc2/images/1.PNG width=300px>
 
 ## C
 ### sc2
